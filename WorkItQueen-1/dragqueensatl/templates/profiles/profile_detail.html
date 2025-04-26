@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ profile.name }} - Drag Queens Atlanta{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <!-- Image will be added later when media functionality is implemented -->
+        <div class="bg-light rounded p-3 text-center mb-3">
+            <i class="fas fa-user fa-5x text-secondary"></i>
+            <p class="mt-2 text-muted">Profile image coming soon</p>
+        </div>
+        
+        <h1>{{ profile.name }}</h1>
+        
+        <div class="social-links mb-4">
+            {% if profile.instagram %}
+                <a href="{{ profile.instagram }}" class="btn btn-outline-primary me-2" target="_blank">Instagram</a>
+            {% endif %}
+            
+            {% if profile.twitter %}
+                <a href="{{ profile.twitter }}" class="btn btn-outline-primary me-2" target="_blank">Twitter</a>
+            {% endif %}
+            
+            {% if profile.youtube %}
+                <a href="{{ profile.youtube }}" class="btn btn-outline-primary me-2" target="_blank">YouTube</a>
+            {% endif %}
+            
+            {% if profile.merchandise %}
+                <a href="{{ profile.merchandise }}" class="btn btn-success" target="_blank">Shop Merch</a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="bio mb-4">
+            <h3>About</h3>
+            <p>{{ profile.bio }}</p>
+        </div>
+        
+        <div class="upcoming-performances">
+            <h3>Upcoming Performances</h3>
+            
+            {% if performances %}
+                <div class="list-group">
+                    {% for performance in performances %}
+                        <a href="{% url 'performance_detail' performance.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ performance.title }}</h5>
+                                <small>{{ performance.date }} at {{ performance.time }}</small>
+                            </div>
+                            <p class="mb-1">{{ performance.venue }}</p>
+                            <small>{{ performance.address }}</small>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No upcoming performances scheduled.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

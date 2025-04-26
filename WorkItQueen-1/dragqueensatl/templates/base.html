@@ -61,8 +61,8 @@
                                         <li><a class="dropdown-item" href="{% url 'profile_detail' user.profile.id %}">View Profile</a></li>
                                         <li><a class="dropdown-item" href="{% url 'edit_profile' %}">Edit Profile</a></li>
                                         <li><a class="dropdown-item" href="{% url 'manage_media' %}">Manage Media</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'manage_products' %}">Manage Merchandise</a></li>
-                                        <li><a class="dropdown-item" href="{% url 'manage_reviews' %}">View Reviews</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="alert('Coming soon!')">Manage Merchandise</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="alert('Coming soon!')">View Reviews</a></li>
                                     {% else %}
                                         <li><a class="dropdown-item" href="{% url 'create_profile' %}">Create Profile</a></li>
                                     {% endif %}
@@ -74,16 +74,16 @@
                                     Groups
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="{% url 'create_group' %}">Create Group</a></li>
-                                    <li><a class="dropdown-item" href="/groups/">My Groups</a></li>
-                                    <li><a class="dropdown-item" href="/groups/discover/">Discover Groups</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="alert('Coming soon!')">Create Group</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="alert('Coming soon!')">My Groups</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="alert('Coming soon!')">Discover Groups</a></li>
                                 </ul>
                             </div>
                             
-                            <a href="{% url 'logout' %}" class="btn btn-danger ms-2">Logout</a>
+                            <a href="{% url 'admin:logout' %}" class="btn btn-danger ms-2">Logout</a>
                         {% else %}
-                            <a href="{% url 'login' %}" class="btn btn-outline-light me-2">Login</a>
-                            <a href="{% url 'register' %}" class="btn btn-outline-light">Register</a>
+                            <a href="{% url 'admin:login' %}" class="btn btn-outline-light me-2">Login</a>
+                            <a href="{% url 'admin:login' %}" class="btn btn-outline-light">Register</a>
                         {% endif %}
                     </nav>
                 </div>

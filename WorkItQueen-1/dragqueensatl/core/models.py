@@ -1,7 +1,4 @@
-
-
-# Create your models here.
-
+# Modified models.py with fixed DragQueen class
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -29,7 +26,8 @@ class Review(models.Model):
         return f"Review by {self.user} for {self.performance}"
 
 
-class DragQueen(models.Model):
+class DragQueen(models.Model):  # Fixed 'models.model' to 'models.Model'
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile', null=True, blank=True)
     name = models.CharField(max_length=100)
     bio = models.TextField()
     #image = models.ImageField(upload_to=, blank=True)  #############IMAGE THINGY
@@ -38,6 +36,9 @@ class DragQueen(models.Model):
     youtube = models.URLField(blank=True)
     merchandise = models.CharField(max_length=100)
     # create a list of performances objects, initialize a struct them and filter for reviews for said queen
+    
+    def __str__(self):
+        return self.name
 
 class DragGroup(models.Model):
     name = models.CharField(max_length=100)

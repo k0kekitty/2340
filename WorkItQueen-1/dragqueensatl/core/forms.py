@@ -1,6 +1,7 @@
 # forms.py
 from django import forms
 from .models import DragQueen
+
 class ProfileForm(forms.ModelForm):
     """Form for creating and editing a drag queen profile"""
     class Meta:
@@ -8,10 +9,13 @@ class ProfileForm(forms.ModelForm):
         exclude = ['user', 'created_at', 'updated_at']
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 5}),
-            'performance_style': forms.TextInput(attrs={'placeholder': 'Comedy, Pageant, Club Kid, etc.'}),
+            'name': forms.TextInput(attrs={'placeholder': 'Your stage name'}),
+            'merchandise': forms.TextInput(attrs={'placeholder': 'Merchandise store URL'}),
         }
 
 """
+Commented out forms until their models are properly implemented:
+
 class ProfileMediaForm(forms.ModelForm):
     #Form for adding and editing profile media
     class Meta:
@@ -46,5 +50,4 @@ class GroupEventForm(forms.ModelForm):
             'date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
             'description': forms.Textarea(attrs={'rows': 4}),
         }
-
 """

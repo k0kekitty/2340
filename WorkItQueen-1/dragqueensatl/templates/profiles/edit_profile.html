@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - Drag Queens Atlanta{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1>Edit Your Drag Queen Profile</h1>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group mb-3">
+            <label for="id_name">Stage Name</label>
+            {{ form.name }}
+            {% if form.name.errors %}
+                <div class="text-danger">{{ form.name.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="id_bio">Biography</label>
+            {{ form.bio }}
+            {% if form.bio.errors %}
+                <div class="text-danger">{{ form.bio.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <h3 class="mt-4">Social Media</h3>
+        
+        <div class="form-group mb-3">
+            <label for="id_instagram">Instagram URL</label>
+            {{ form.instagram }}
+            {% if form.instagram.errors %}
+                <div class="text-danger">{{ form.instagram.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="id_twitter">Twitter URL</label>
+            {{ form.twitter }}
+            {% if form.twitter.errors %}
+                <div class="text-danger">{{ form.twitter.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="id_youtube">YouTube URL</label>
+            {{ form.youtube }}
+            {% if form.youtube.errors %}
+                <div class="text-danger">{{ form.youtube.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <h3 class="mt-4">Merchandise</h3>
+        
+        <div class="form-group mb-3">
+            <label for="id_merchandise">Merchandise Store URL</label>
+            {{ form.merchandise }}
+            {% if form.merchandise.errors %}
+                <div class="text-danger">{{ form.merchandise.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <button type="submit" class="btn btn-primary mt-4">Update Profile</button>
+    </form>
+</div>
+{% endblock %}
