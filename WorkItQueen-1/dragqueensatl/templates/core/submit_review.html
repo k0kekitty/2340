@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Review - {{ performance.title }}{% endblock %}
+
+{% block content %}
+<h1>Add Review for {{ performance.title }}</h1>
+<p>Performance by {{ performance.queen_name }} at {{ performance.venue }} on {{ performance.date }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Submit Review</button>
+    <a href="{% url 'performance_detail' performance.id %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

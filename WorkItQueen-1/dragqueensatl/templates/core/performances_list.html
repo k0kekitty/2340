@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Performances - Drag Queens Atlanta{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Upcoming Performances</h1>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Filter Performances</h5>
+            </div>
+            <div class="card-body">
+                <form method="get" action="{% url 'performances_list' %}" class="row g-3">
+                    <div class="col-md-5">
+                        <label for="date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="date" name="date" value="{{ date_filter }}">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="venue" class="form-label">Venue</label>
+                        <select class="form-select" id="venue" name="venue">
+                            <option value="">All Venues</option>
+                            {% for venue in venues %}
+                                <option value="{{ venue }}" {% if venue == venue_filter %}selected{% endif %}>{{ venue }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-end">
+                <a href="{% url 'performances_list' %}" class="btn btn-secondary">Reset Filters</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="list-group">
+    {% for performance in performances %}
+        <a href="{% url 'performance_detail' performance.id %}" class="list-group-item list-group-item-action">
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ performance.title }}</h5>
+                        <span class="badge bg-primary">{{ performance.time }}</span>
+                    </div>
+                    <p class="mb-1">{{ performance.queen_name }} at {{ performance.venue }}</p>
+                    <small>{{ performance.date }} • {{ performance.address }}</small>
+                </div>
+                <div class="col-md-3 text-end d-flex align-items-center justify-content-end">
+                    <span class="badge bg-success">{{ performance.reviews.count }} reviews</span>
+                </div>
+            </div>
+        </a>
+    {% empty %}
+        <div class="alert alert-info">No performances found matching your criteria.</div>
+    {% endfor %}
+</div>
+{% endblock %}

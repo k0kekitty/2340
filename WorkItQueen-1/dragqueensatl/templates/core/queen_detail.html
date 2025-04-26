@@ -1,0 +1,58 @@
+<!-- templates/core/queen_detail.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ queen.name }} - Drag Queens Atlanta{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <img src="{% static queen.image %}" class="img-fluid rounded mb-3" alt="{{ queen.name }}">
+        
+        <h1>{{ queen.name }}</h1>
+        
+        <div class="social-links mb-4">
+            {% if queen.instagram %}
+                <a href="{{ queen.instagram }}" class="btn btn-outline-primary me-2" target="_blank">Instagram</a>
+            {% endif %}
+            
+            {% if queen.twitter %}
+                <a href="{{ queen.twitter }}" class="btn btn-outline-primary me-2" target="_blank">Twitter</a>
+            {% endif %}
+            
+            {% if queen.merchandise %}
+                <a href="{{ queen.merchandise }}" class="btn btn-success" target="_blank">Shop Merch</a>
+            {% endif %}
+            <button class="btn btn-primary" disabled>Follow (Coming Soon)</button>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="bio mb-4">
+            <h3>About</h3>
+            <p>{{ queen.bio }}</p>
+        </div>
+        
+        <div class="upcoming-performances">
+            <h3>Upcoming Performances</h3>
+            
+            {% if performances %}
+                <div class="list-group">
+                    {% for performance in performances %}
+                        <a href="{% url 'performance_detail' performance.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ performance.title }}</h5>
+                                <small>{{ performance.date }} at {{ performance.time }}</small>
+                            </div>
+                            <p class="mb-1">{{ performance.venue }}</p>
+                            <small>{{ performance.address }}</small>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No upcoming performances scheduled.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

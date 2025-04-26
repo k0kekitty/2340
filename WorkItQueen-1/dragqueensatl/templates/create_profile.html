@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-4">
+    <h1>Create Your Drag Queen Profile</h1>
+    
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group mb-3">
+            <label for="id_stage_name">Stage Name</label>
+            {{ form.stage_name }}
+            {% if form.stage_name.errors %}
+                <div class="text-danger">{{ form.stage_name.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="id_pronouns">Pronouns</label>
+            {{ form.pronouns }}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="id_bio">Biography</label>
+            {{ form.bio }}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="id_location">Location</label>
+            {{ form.location }}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="id_performance_style">Performance Style</label>
+            {{ form.performance_style }}
+        </div>
+        
+        <h3 class="mt-4">Contact Information</h3>
+        
+        <div class="form-group mb-3">
+            <label for="id_booking_email">Booking Email</label>
+            {{ form.booking_email }}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="id_booking_phone">Booking Phone</label>
+            {{ form.booking_phone }}
+        </div>
+        
+        <h3 class="mt-4">Social Media</h3>
+        
+        <div class="form-group mb-3">
+            <label for="id_instagram">Instagram URL</label>
+            {{ form.instagram }}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="id_twitter">Twitter URL</label>
+            {{ form.twitter }}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="id_tiktok">TikTok URL</label>
+            {{ form.tiktok }}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="id_facebook">Facebook URL</label>
+            {{ form.facebook }}
+        </div>
+        
+        <div class="form-group mb-3">
+            <label for="id_youtube">YouTube URL</label>
+            {{ form.youtube }}
+        </div>
+        
+        <h3 class="mt-4">Merchandise</h3>
+        
+        <div class="form-group mb-3">
+            <label for="id_merch_store_url">Merchandise Store URL</label>
+            {{ form.merch_store_url }}
+        </div>
+        
+        <button type="submit" class="btn btn-primary mt-4">Create Profile</button>
+    </form>
+</div>
+{% endblock %}

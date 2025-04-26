@@ -1,0 +1,25 @@
+<!-- templates/core/queens_list.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Drag Queens - Drag Queens Atlanta{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Meet Our Queens</h1>
+<p class="lead">Discover amazing drag performers in Atlanta.</p>
+
+<div class="row">
+    {% for queen in queens %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <img src="{% static queen.image %}" class="card-img-top" alt="{{ queen.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ queen.name }}</h5>
+                    <p class="card-text">{{ queen.bio|truncatewords:30 }}</p>
+                    <a href="{% url 'queen_detail' queen.id %}" class="btn btn-primary">View Profile</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

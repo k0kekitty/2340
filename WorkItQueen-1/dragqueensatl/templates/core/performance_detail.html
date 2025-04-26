@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ performance.title }} - Drag Queens Atlanta{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1>{{ performance.title }}</h1>
+        <p class="lead">Performed by <a href="{% url 'queen_detail' performance.queen_id %}">{{ performance.queen_name }}</a></p>
+
+        <div class="performance-details mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Performance Details</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Date:</strong> {{ performance.date }}</p>
+                    <p><strong>Time:</strong> {{ performance.time }}</p>
+                    <p><strong>Venue:</strong> {{ performance.venue }}</p>
+                    <p><strong>Address:</strong> {{ performance.address }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="description mb-4">
+            <h3>Description</h3>
+            <p>{{ performance.description }}</p>
+        </div>
+
+        <div class="reviews">
+            <h3>Reviews</h3>
+            {% if user.is_authenticated %}
+                <p><a href="{% url 'submit_review' performance.id %}" class="btn btn-primary mb-3">Add a Review</a></p>
+            {% endif %}
+
+            {% for review in performance.reviews.all %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <h5>{{ review.user.username }}</h5>
+                            <div class="star-rating">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        ★
+                                    {% else %}
+                                        ☆
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <p class="card-text">{{ review.comment }}</p>
+                        <small class="text-muted">Posted on {{ review.created_at }}</small>
+                    </div>
+                </div>
+            {% empty %}
+                <p>No reviews yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Location</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Venue:</strong> {{ performance.venue }}</p>
+                <p><strong>Address:</strong> {{ performance.address }}</p>
+                <a href="https://www.google.com/maps/search/?api=1&query={{ performance.address|urlencode }}" 
+                   class="btn btn-outline-primary w-100" target="_blank">
+                    View on Google Maps
+                </a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">About the Performer</h5>
+            </div>
+            <div class="card-body">
+                <img src="{% static queen.image %}" class="img-fluid rounded mb-3" alt="{{ queen.name }}">
+                <h5>{{ queen.name }}</h5>
+                <p>{{ queen.bio|truncatewords:40 }}</p>
+                <a href="{% url 'queen_detail' performance.queen_id %}" class="btn btn-primary">View Full Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+<!-- templates/core/home.html -->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded mb-4">
+    <h1 class="display-4">Welcome to Drag Queens Atlanta</h1>
+    <p class="lead">Discover amazing drag performances in Atlanta. Find your favorite queens and upcoming shows.</p>
+    <hr class="my-4">
+    <p>Browse through profiles, check out upcoming performances, and discover the best drag talent in Atlanta.</p>
+    <a class="btn btn-primary btn-lg" href="{% url 'performances_list' %}" role="button">Find Performances</a>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h2>Featured Queens</h2>
+        <div class="row">
+            {% for queen in featured_queens %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <img src="{% static queen.image %}" class="card-img-top" alt="{{ queen.name }}">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ queen.name }}</h5>
+                            <p class="card-text">{{ queen.bio|truncatewords:20 }}</p>
+                            <a href="{% url 'queen_detail' queen.id %}" class="btn btn-primary">View Profile</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <p class="text-center">
+            <a href="{% url 'queens_list' %}" class="btn btn-outline-primary">See All Queens</a>
+        </p>
+    </div>
+    
+    <div class="col-md-6">
+        <h2>Upcoming Performances</h2>
+        <div class="list-group">
+            {% for performance in upcoming_performances %}
+                <a href="{% url 'performance_detail' performance.id %}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ performance.title }}</h5>
+                        <small>{{ performance.date }} at {{ performance.time }}</small>
+                    </div>
+                    <p class="mb-1">{{ performance.queen_name }} at {{ performance.venue }}</p>
+                </a>
+            {% endfor %}
+        </div>
+        <p class="text-center mt-3">
+            <a href="{% url 'performances_list' %}" class="btn btn-outline-primary">See All Performances</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
