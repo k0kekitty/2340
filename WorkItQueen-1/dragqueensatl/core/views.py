@@ -428,10 +428,10 @@ def profile_detail(request, pk):
     
     return render(request, 'profiles/profile_detail.html', context)
 
-@login_required
+"""
 @login_required
 def manage_media(request):
-    """Manage profile photos and videos"""
+    
     try:
         profile = DragQueen.objects.get(user=request.user)
     except DragQueen.DoesNotExist:
@@ -457,6 +457,44 @@ def manage_media(request):
         'photos': photos,
         'videos': videos,
         'profile': profile, 
+    })
+
+"""
+
+@login_required
+def manage_media(request):
+    """Manage profile photos and videos (including profile picture upload)."""
+    try:
+        profile = DragQueen.objects.get(user=request.user)
+    except DragQueen.DoesNotExist:
+        return redirect('create_profile')
+    
+    if request.method == 'POST':
+        form = ProfileMediaForm(request.POST, request.FILES)
+        if form.is_valid():
+            media = form.save(commit=False)
+            media.profile = profile
+            media.save()
+            
+            # Check if the user wants to set this media as their profile picture
+            if request.POST.get('set_as_profile'):
+                # Assume your DragQueen model has a field called profile_picture
+                profile.profile_picture = media.file
+                profile.save()
+            
+            messages.success(request, "Media added successfully!")
+            return redirect('manage_media')
+    else:
+        form = ProfileMediaForm()
+    
+    photos = ProfileMedia.objects.filter(profile=profile, media_type='PHOTO')
+    videos = ProfileMedia.objects.filter(profile=profile, media_type='VIDEO')
+    
+    return render(request, 'profiles/manage_media.html', {
+        'form': form,
+        'photos': photos,
+        'videos': videos,
+        'profile': profile,
     })
 
 
@@ -1630,4 +1668,26 @@ def my_reviews(request):
 
     return render(request, 'profiles/my_reviews.html', {
         'reviews': reviews
+    })
+
+@login_required
+def update_profile_picture(request):
+    try:
+        profile = DragQueen.objects.get(user=request.user)
+    except DragQueen.DoesNotExist:
+        return redirect('create_profile')
+    
+    if request.method == 'POST':
+        form = ProfilePictureForm(request.POST, request.FILES)
+        if form.is_valid():
+            profile.profile_picture = form.cleaned_data['profile_picture']
+            profile.save()
+            messages.success(request, "Profile picture updated!")
+            return redirect('profile_detail', pk=profile.pk)
+    else:
+        form = ProfilePictureForm()
+    
+    return render(request, 'profiles/update_profile_picture.html', {
+        'form': form,
+        'profile': profile,
     })

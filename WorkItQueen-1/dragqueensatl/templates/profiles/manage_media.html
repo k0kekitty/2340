@@ -3,14 +3,16 @@
 {% block title %}Manage Media - Drag Queens Atlanta{% endblock %}
 
 {% block content %}
-<div class="container my-4">
-    <h1>Manage Media</h1>
-    
-    <div class="alert alert-info">
-        <h4>Coming Soon!</h4>
-        <p>Media management functionality is currently under development. Check back soon to upload photos and videos to your profile!</p>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="set_as_profile" id="set_as_profile">
+        <label class="form-check-label" for="set_as_profile">
+            Set as my profile picture
+        </label>
     </div>
-    
-    <a href="{% url 'profile_detail' profile.id %}" class="btn btn-primary">Back to Profile</a>
-</div>
+    <button type="submit" class="btn btn-primary mt-3">Upload</button>
+</form>
+
 {% endblock %}
