@@ -42,6 +42,8 @@ class DragQueen(models.Model):
     tiktok = models.URLField(blank=True)
     merchandise = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
+
     
     def __str__(self):
         return self.name

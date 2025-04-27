@@ -66,5 +66,8 @@ urlpatterns = [
 
     path('my_reviews/', views.my_reviews, name='my_reviews'),
 
+    path('profile/update_picture/', views.update_profile_picture, name='update_profile_picture'),
+
+
 
 ]

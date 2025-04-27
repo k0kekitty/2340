@@ -158,3 +158,7 @@ class SearchForm(forms.Form):
         'placeholder': 'City, state',
         'class': 'form-control'
     }))
+
+
+class ProfilePictureForm(forms.Form):
+    profile_picture = forms.ImageField()
