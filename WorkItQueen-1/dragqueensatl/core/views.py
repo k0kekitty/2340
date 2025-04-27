@@ -111,7 +111,7 @@ def queen_detail(request, queen_id):
         queen = DragQueen.objects.get(id=queen_id)
         # Get upcoming performances for this queen
         performances = Performance.objects.filter(
-            drag_queen=queen,
+            queen_id=queen.id,
             date__gte=timezone.now().date()
         ).order_by('date', 'time')
         
@@ -135,7 +135,7 @@ def queen_detail(request, queen_id):
     except DragQueen.DoesNotExist:
         # Fall back to static data
         queen = next((q for q in QUEENS if q['id'] == queen_id), None)
-        performances = Performance.objects.filter(queen_id=queen_id)
+        performances = Performance.objects.filter(drag_queen__id=queen_id)
         
         if not queen:
             messages.error(request, "Queen not found!")
@@ -196,16 +196,16 @@ def performance_detail(request, performance_id):
     performance = get_object_or_404(Performance, id=performance_id)
     
     # Try to get the queen from database first
-    if performance.drag_queen:
-        queen = performance.drag_queen
+    if performance.queen_name:
+        queen = performance.queen_name
     else:
         # Fall back to static data
         queen = next((q for q in QUEENS if q['id'] == performance.queen_id), None)
     
     # Get related performances (by same queen or at same venue)
-    if performance.drag_queen:
+    if performance.queen_name:
         related_performances = Performance.objects.filter(
-            Q(drag_queen=performance.drag_queen) | Q(venue=performance.venue)
+            Q(queen_name=performance.queen_name) | Q(venue=performance.venue)
         ).exclude(id=performance_id)[:3]
     else:
         related_performances = Performance.objects.filter(
@@ -389,16 +389,17 @@ def profile_detail(request, pk):
     """Public profile view"""
     profile = get_object_or_404(DragQueen, pk=pk)
     
+    
     # Get performances linked to this queen
     performances = Performance.objects.filter(
-        drag_queen=profile,
+        queen_id=profile.id,
         date__gte=timezone.now().date()
     ).order_by('date', 'time')
     
     # Get past performances with reviews
     past_performances = Performance.objects.filter(
-        drag_queen=profile,
-        date__lt=timezone.now().date()
+    queen_id=profile.id,
+    date__lt=timezone.now().date()
     ).annotate(
         review_count=Count('reviews'),
         avg_rating=Avg('reviews__rating')
@@ -428,6 +429,7 @@ def profile_detail(request, pk):
     return render(request, 'profiles/profile_detail.html', context)
 
 @login_required
+@login_required
 def manage_media(request):
     """Manage profile photos and videos"""
     try:
@@ -453,8 +455,10 @@ def manage_media(request):
     return render(request, 'profiles/manage_media.html', {
         'form': form,
         'photos': photos,
-        'videos': videos
+        'videos': videos,
+        'profile': profile, 
     })
+
 
 @login_required
 def delete_media(request, media_id):
@@ -1598,3 +1602,32 @@ def my_groups(request):
     }
     
     return render(request, 'groups/my_groups.html', context)
+
+
+    # core/views.py
+
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login
+from django.shortcuts import render, redirect
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)  # auto-login after registering
+            return redirect('create_profile')  # send them to create their profile
+    else:
+        form = UserCreationForm()
+    return render(request, 'registration/register.html', {'form': form})
+
+from .models import Review
+
+@login_required
+def my_reviews(request):
+    """View all reviews the logged-in user has written."""
+    reviews = Review.objects.filter(user=request.user).order_by('-created_at')
+
+    return render(request, 'profiles/my_reviews.html', {
+        'reviews': reviews
+    })

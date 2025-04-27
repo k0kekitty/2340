@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Group - Drag Queens Atlanta{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Create Drag Queen Group</h1>
+    <p class="lead">Create a group to connect with other drag performers, plan events, and share photos.</p>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_name" class="form-label">Group Name</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <div class="text-danger">{{ form.name.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_description" class="form-label">Description</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div class="text-danger">{{ form.description.errors }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_logo" class="form-label">Logo</label>
+                    {{ form.logo }}
+                    {% if form.logo.errors %}
+                        <div class="text-danger">{{ form.logo.errors }}</div>
+                    {% endif %}
+                    <div class="form-text">Upload an image to represent your group.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="form-check">
+                        {{ form.is_public }}
+                        <label class="form-check-label" for="id_is_public">
+                            Public Group (visible to everyone)
+                        </label>
+                    </div>
+                    <div class="form-text">Public groups can be found by anyone on Drag Queens Atlanta.</div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="form-check">
+                        {{ form.allow_member_posts }}
+                        <label class="form-check-label" for="id_allow_member_posts">
+                            Allow Members to Post
+                        </label>
+                    </div>
+                    <div class="form-text">Let members create posts in the group (not just admins).</div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="form-check">
+                        {{ form.allow_member_events }}
+                        <label class="form-check-label" for="id_allow_member_events">
+                            Allow Members to Create Events
+                        </label>
+                    </div>
+                    <div class="form-text">Let members create events in the group (not just admins).</div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Create Group</button>
+                <a href="{% url 'home' %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

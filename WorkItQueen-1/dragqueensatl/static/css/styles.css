@@ -1,0 +1,140 @@
+/* Add this to a new file: static/css/styles.css */
+
+/* Custom colors */
+:root {
+  --dq-primary: #9c27b0;
+  --dq-primary-dark: #7b1fa2;
+  --dq-primary-light: #e1bee7;
+  --dq-accent: #ff4081;
+  --dq-text-on-primary: #ffffff;
+}
+
+/* Header customization */
+.site-header {
+  background-color: var(--dq-primary);
+  color: var(--dq-text-on-primary);
+  padding: 1rem 0;
+  margin-bottom: 2rem;
+}
+
+/* Card customization */
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card-img-top {
+  height: 250px;
+  object-fit: cover;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+/* Star rating */
+.star-rating {
+  color: gold;
+  font-size: 1.2rem;
+}
+
+/* Dropdown menu customization */
+.dropdown-menu {
+  background-color: var(--dq-primary);
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.dropdown-item {
+  color: var(--dq-text-on-primary);
+  padding: 8px 16px;
+}
+
+.dropdown-item:hover {
+  background-color: var(--dq-primary-dark);
+  color: var(--dq-text-on-primary);
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: var(--dq-primary);
+  border-color: var(--dq-primary);
+}
+
+.btn-primary:hover {
+  background-color: var(--dq-primary-dark);
+  border-color: var(--dq-primary-dark);
+}
+
+.btn-outline-primary {
+  color: var(--dq-primary);
+  border-color: var(--dq-primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--dq-primary);
+  border-color: var(--dq-primary);
+}
+
+/* Form controls */
+.form-control:focus {
+  border-color: var(--dq-primary-light);
+  box-shadow: 0 0 0 0.25rem rgba(156, 39, 176, 0.25);
+}
+
+/* Notifications */
+.notification-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(30%, -30%);
+}
+
+/* Gallery */
+.gallery-image {
+  height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.gallery-image:hover {
+  transform: scale(1.03);
+}
+
+/* Performance card */
+.performance-card {
+  border-left: 4px solid var(--dq-primary);
+}
+
+/* Map container */
+#map {
+  height: 300px;
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Footer */
+.footer {
+  background-color: #f8f9fa;
+  padding: 2rem 0;
+  margin-top: 3rem;
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+  .card-img-top {
+    height: 200px;
+  }
+  
+  #map {
+    height: 250px;
+  }
+}

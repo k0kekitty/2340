@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}My Groups{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">My Groups</h1>
+
+    {% if admin_groups or member_groups %}
+        <div class="row">
+            {% if admin_groups %}
+                <h3>Groups You Admin</h3>
+                {% for group in admin_groups %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ group.name }}</h5>
+                            <p class="card-text">{{ group.description }}</p>
+                            <a href="{% url 'group_detail' group.pk %}" class="btn btn-primary">View Group</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if member_groups %}
+                <h3 class="mt-4">Groups You're a Member Of</h3>
+                {% for group in member_groups %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ group.name }}</h5>
+                            <p class="card-text">{{ group.description }}</p>
+                            <a href="{% url 'group_detail' group.pk %}" class="btn btn-primary">View Group</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% else %}
+        <p>You are not a member of any groups yet. <a href="{% url 'discover_groups' %}">Discover groups</a> to join!</p>
+    {% endif %}
+</div>
+{% endblock %}

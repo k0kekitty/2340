@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}My Reviews{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">My Reviews</h1>
+
+    {% if reviews %}
+        <div class="list-group">
+            {% for review in reviews %}
+                <div class="list-group-item mb-3">
+                    <h5>{{ review.performance.title }}</h5>
+                    <small class="text-muted">{{ review.created_at|date:"F j, Y" }}</small>
+                    <p class="mt-2">Rating: {{ review.rating }} </p>
+                    <p>{{ review.comment }}</p>
+                    <a href="{% url 'performance_detail' review.performance.id %}" class="btn btn-sm btn-outline-primary">View Performance</a>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>You haven't written any reviews yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ group.name }} - Drag Queens Atlanta{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            {% if group.logo %}
+                <img src="{{ group.logo.url }}" class="img-fluid rounded mb-3" alt="{{ group.name }}">
+            {% else %}
+                <div class="bg-light rounded p-5 text-center mb-3">
+                    <i class="fas fa-users fa-5x text-secondary"></i>
+                </div>
+            {% endif %}
+            
+            <h1>{{ group.name }}</h1>
+            <p class="text-muted">
+                Created {{ group.created_at|date:"F j, Y" }}
+            </p>
+            
+            {% if is_admin %}
+                <div class="d-grid gap-2 mb-3">
+                    <a href="{% url 'manage_group' pk=group.id %}" class="btn btn-primary">Manage Group</a>
+                    <a href="{% url 'create_group_event' group_id=group.id %}" class="btn btn-outline-primary">Plan Event</a>
+                </div>
+            {% elif is_member %}
+                <div class="d-grid mb-3">
+                    <a href="{% url 'leave_group' pk=group.id %}" class="btn btn-danger confirm-action" 
+                       data-confirm-message="Are you sure you want to leave {{ group.name }}? You'll need to be invited back to rejoin.">
+                        Leave Group
+                    </a>
+                </div>
+            {% else %}
+                <div class="d-grid mb-3">
+                    <a href="{% url 'join_group' pk=group.id %}" class="btn btn-primary">Join Group</a>
+                </div>
+            {% endif %}
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Description</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ group.description }}</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Members ({{ members|length }})</h5>
+                    {% if is_admin %}
+                        <a href="{% url 'invite_member' group_id=group.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-user-plus"></i> Invite
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="list-group list-group-flush">
+                    {% for member in members %}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <a href="{% url 'profile_detail' pk=member.profile.id %}" class="text-decoration-none">
+                                    <strong>{{ member.profile.name }}</strong>
+                                </a>
+                                {% if member.role == 'ADMIN' %}
+                                    <span class="badge bg-primary">Admin</span>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <small class="text-muted me-2">Joined {{ member.joined_date|date:"M d, Y" }}</small>
+                                {% if is_admin and member.profile.id != user.profile.id %}
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                                                id="memberActions{{ member.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="memberActions{{ member.id }}">
+                                            {% if member.role == 'ADMIN' %}
+                                                <li>
+                                                    <a class="dropdown-item" href="{% url 'change_role' group_id=group.id member_id=member.id %}?role=MEMBER">
+                                                        Remove Admin Role
+                                                    </a>
+                                                </li>
+                                            {% else %}
+                                                <li>
+                                                    <a class="dropdown-item" href="{% url 'change_role' group_id=group.id member_id=member.id %}?role=ADMIN">
+                                                        Make Admin
+                                                    </a>
+                                                </li>
+                                            {% endif %}
+                                            <li>
+                                                <a class="dropdown-item text-danger confirm-action" 
+                                                   href="{% url 'remove_member' group_id=group.id member_id=member.id %}"
+                                                   data-confirm-message="Are you sure you want to remove {{ member.profile.name }} from the group?">
+                                                    Remove from Group
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="list-group-item">No members yet</div>
+                    {% endfor %}
+                </div>
+                
+                {% if members|length > 5 %}
+                    <div class="card-footer text-center">
+                        <a href="{% url 'group_members' group_id=group.id %}" class="text-decoration-none">
+                            View All Members
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <!-- Group Events Section -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Group Events</h2>
+                {% if is_admin %}
+                    <a href="{% url 'create_group_event' group_id=group.id %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Schedule Event
+                    </a>
+                {% endif %}
+            </div>
+            
+            <!-- Upcoming Events Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Upcoming Events</h5>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_events %}
+                        <div class="list-group">
+                            {% for event in upcoming_events %}
+                                <a href="{% url 'group_event_detail' group_id=group.id event_id=event.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ event.title }}</h5>
+                                        <small>{{ event.date|date:"M d, Y" }} at {{ event.time|time:"g:i A" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ event.venue }}</p>
+                                    <small>{{ event.address }}</small>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No upcoming events scheduled. Check back soon!
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if all_events_count > 3 %}
+                    <div class="card-footer text-center">
+                        <a href="{% url 'group_events' group_id=group.id %}" class="text-decoration-none">
+                            View All {{ all_events_count }} Events
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Past Events Section -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Past Events</h5>
+                </div>
+                <div class="card-body">
+                    {% if past_events %}
+                        <div class="list-group">
+                            {% for event in past_events %}
+                                <a href="{% url 'group_event_detail' group_id=group.id event_id=event.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ event.title }}</h5>
+                                        <small>{{ event.date|date:"M d, Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ event.venue }}</p>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No past events to display.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Group Photo Gallery -->
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Group Gallery</h5>
+                    {% if is_member %}
+                        <a href="{% url 'upload_group_photo' group_id=group.id %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-upload"></i> Upload Photos
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if group_photos %}
+                        <div class="row">
+                            {% for photo in group_photos %}
+                                <div class="col-md-4 col-6 mb-3">
+                                    <a href="{{ photo.file.url }}" data-lightbox="group-gallery" data-title="{{ photo.caption }}">
+                                        <img src="{{ photo.file.url }}" alt="{{ photo.caption }}" class="img-fluid rounded">
+                                    </a>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No photos have been shared in this group yet.
+                            {% if is_member %}
+                                <a href="{% url 'upload_group_photo' group_id=group.id %}" class="alert-link">Be the first to upload!</a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if group_photos_count > 6 %}
+                    <div class="card-footer text-center">
+                        <a href="{% url 'group_gallery' group_id=group.id %}" class="text-decoration-none">
+                            View All Photos
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

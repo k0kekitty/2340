@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Discover Groups{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Discover New Groups</h1>
+
+    <form method="get" class="mb-4">
+        <input type="text" name="q" placeholder="Search groups..." class="form-control" value="{{ search_query }}">
+    </form>
+
+    {% if groups %}
+        <div class="row">
+            {% for group in groups %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ group.name }}</h5>
+                        <p class="card-text">{{ group.description }}</p>
+                        {% if group.id in user_groups %}
+                            <span class="badge bg-success">Member</span>
+                        {% else %}
+                            <a href="{% url 'join_group' group.pk %}" class="btn btn-primary">Join Group</a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No groups found. Try searching for something else.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage {{ group.name }} - Drag Queens Atlanta{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Manage {{ group.name }}</h1>
+        <a href="{% url 'group_detail' pk=group.id %}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Back to Group
+        </a>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Group Information Form -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Group Information</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="id_name" class="form-label">Group Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger">{{ form.name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_description" class="form-label">Description</label>
+                            {{ form.description }}
+                            {% if form.description.errors %}
+                                <div class="text-danger">{{ form.description.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_logo" class="form-label">Logo</label>
+                            {% if group.logo %}
+                                <div class="mb-2">
+                                    <img src="{{ group.logo.url }}" alt="{{ group.name }} Logo" class="img-thumbnail" style="max-height: 100px;">
+                                </div>
+                            {% endif %}
+                            {{ form.logo }}
+                            {% if form.logo.errors %}
+                                <div class="text-danger">{{ form.logo.errors }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Danger Zone -->
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Danger Zone</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Delete Group</strong></p>
+                    <p>Once you delete a group, there is no going back. Please be certain.</p>
+                    <form method="post" action="{% url 'delete_group' group_id=group.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger confirm-action"
+                                data-confirm-message="Are you absolutely sure you want to delete {{ group.name }}? This action CANNOT be undone and will delete all events, photos, and other content associated with this group.">
+                            Delete this group
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <!-- Invite Members -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Invite Members</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'invite_member' group_id=group.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label">Invite by Email</label>
+                            <input type="email" class="form-control" id="id_email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_message" class="form-label">Personal Message (optional)</label>
+                            <textarea class="form-control" id="id_message" name="message" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Invitation</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Pending Invitations -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Pending Invitations</h5>
+                </div>
+                <div class="card-body">
+                    {% if pending_invitations %}
+                        <div class="list-group">
+                            {% for invitation in pending_invitations %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ invitation.email }}</strong>
+                                        <br>
+                                        <small class="text-muted">Sent {{ invitation.created_at|date:"M d, Y" }}</small>
+                                    </div>
+                                    <form method="post" action="{% url 'cancel_invitation' group_id=group.id invitation_id=invitation.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                    </form>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No pending invitations.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Group Settings -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Group Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'update_group_settings' group_id=group.id %}">
+                        {% csrf_token %}
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="id_is_public" name="is_public" 
+                                   {% if group.is_public %}checked{% endif %}>
+                            <label class="form-check-label" for="id_is_public">
+                                Public Group
+                            </label>
+                            <div class="form-text">Public groups can be found in search results.</div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="id_allow_member_posts" name="allow_member_posts" 
+                                   {% if group.allow_member_posts %}checked{% endif %}>
+                            <label class="form-check-label" for="id_allow_member_posts">
+                                Allow Member Posts
+                            </label>
+                            <div class="form-text">Allow non-admin members to create posts.</div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="id_allow_member_events" name="allow_member_events" 
+                                   {% if group.allow_member_events %}checked{% endif %}>
+                            <label class="form-check-label" for="id_allow_member_events">
+                                Allow Member Events
+                            </label>
+                            <div class="form-text">Allow non-admin members to create events.</div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Save Settings</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
