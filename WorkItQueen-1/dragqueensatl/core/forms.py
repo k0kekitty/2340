@@ -6,7 +6,7 @@ from .models import (
     DragQueen, Performance, Review, ProfileMedia, 
     DragGroup, GroupEvent, GroupPhoto, EventPhoto
 )
-
+'''
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(required=True)
     
@@ -20,13 +20,25 @@ class CustomUserCreationForm(UserCreationForm):
         if commit:
             user.save()
         return user
+'''
+class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control'}))
 
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password1'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password2'].widget.attrs.update({'class': 'form-control'})
 class ProfileForm(forms.ModelForm):
     """Form for creating and editing a drag queen profile"""
     class Meta:
         model = DragQueen
         fields = ['name', 'bio', 'performance_style', 'location', 
-                 'instagram', 'twitter', 'youtube', 'facebook', 'tiktok', 'merchandise']
+                 'instagram', 'twitter', 'youtube', 'facebook', 'tiktok', 'merchandise', 'profile_picture','youtube_video_url']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your stage name'}),
             'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 5}),
@@ -38,6 +50,7 @@ class ProfileForm(forms.ModelForm):
             'facebook': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://facebook.com/yourpage'}),
             'tiktok': forms.URLInput(attrs={'class': 'form-control', 'placeholder': 'https://tiktok.com/@yourusername'}),
             'merchandise': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'https://etsy.com/shop/yourshop'}),
+            'profile_picture': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
 
 class ProfileMediaForm(forms.ModelForm):

@@ -13,23 +13,22 @@
             </div>
             <div class="card-body">
                 <form method="get" action="{% url 'performances_list' %}" class="row g-3">
-                    <div class="col-md-5">
-                        <label for="date" class="form-label">Date</label>
-                        <input type="date" class="form-control" id="date" name="date" value="{{ date_filter }}">
-                    </div>
-                    <div class="col-md-5">
-                        <label for="venue" class="form-label">Venue</label>
-                        <select class="form-select" id="venue" name="venue">
-                            <option value="">All Venues</option>
-                            {% for venue in venues %}
-                                <option value="{{ venue }}" {% if venue == venue_filter %}selected{% endif %}>{{ venue }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
-                    </div>
-                </form>
+    <div class="col-md-5">
+        <label for="id_date_from" class="form-label">Date From</label>
+        {{ form.date_from }}
+    </div>
+    <div class="col-md-5">
+        <label for="id_date_to" class="form-label">Date To</label>
+        {{ form.date_to }}
+    </div>
+    <div class="col-md-5">
+        <label for="id_venue" class="form-label">Venue</label>
+        {{ form.venue }}
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+    </div>
+</form>
             </div>
             <div class="card-footer text-end">
                 <a href="{% url 'performances_list' %}" class="btn btn-secondary">Reset Filters</a>

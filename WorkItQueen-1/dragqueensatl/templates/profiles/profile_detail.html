@@ -1,16 +1,19 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load youtube_extras %}
 {% block title %}{{ profile.name }} - Drag Queens Atlanta{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-4">
-        <!-- Image will be added later when media functionality is implemented -->
         <div class="bg-light rounded p-3 text-center mb-3">
-            <i class="fas fa-user fa-5x text-secondary"></i>
-            <p class="mt-2 text-muted">Profile image coming soon</p>
-        </div>
+    {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" alt="{{ profile.name }}" class="img-fluid rounded-circle" style="max-width: 250px;">
+    {% else %}
+        <i class="fas fa-user fa-5x text-secondary"></i>
+        <p class="mt-2 text-muted">No profile image yet</p>
+    {% endif %}
+</div>
         
         <h1>{{ profile.name }}</h1>
         
@@ -40,6 +43,14 @@
             <h3>About</h3>
             <p>{{ profile.bio }}</p>
         </div>
+    {% if profile.youtube_video_url %}
+<div class="youtube-video mb-4">
+    <h3>Featured Performance Video</h3>
+    <div class="ratio ratio-16x9">
+        <iframe src="https://www.youtube.com/embed/{{ profile.youtube_video_url|youtube_embed_id }}" frameborder="0" allowfullscreen></iframe>
+    </div>
+</div>
+{% endif %}
         
         <div class="upcoming-performances">
             <h3>Upcoming Performances</h3>

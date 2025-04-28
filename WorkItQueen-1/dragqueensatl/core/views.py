@@ -10,7 +10,13 @@ from datetime import timedelta
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.contrib.auth.models import User
-
+from core.forms import CustomUserCreationForm
+from django.core.mail import send_mail
+from django.utils import timezone
+from datetime import timedelta
+from core.models import DragQueen
+import datetime
+from django.http import JsonResponse
 from .models import (
     DragQueen, Performance, Review, ProfileMedia, 
     DragGroup, GroupMembership, UserPreference, Notification
@@ -19,7 +25,7 @@ from .forms import (
     ProfileForm, ProfileMediaForm, PerformanceForm, ReviewForm,
     GroupForm, SearchForm, CustomUserCreationForm
 )
-
+'''
 # Keep the static data for backward compatibility
 # This can be gradually phased out as you add real data
 QUEENS = [
@@ -31,6 +37,7 @@ QUEENS = [
         'instagram': 'https://instagram.com',
         'twitter': 'https://twitter.com',
         'merchandise': 'https://etsy.com',
+'youtube_video_url': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     },
     {
         'id': 2,
@@ -40,6 +47,7 @@ QUEENS = [
         'instagram': 'https://instagram.com',
         'twitter': 'https://twitter.com',
         'merchandise': 'https://etsy.com',
+'youtube_video_url': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     },
     {
         'id': 3,
@@ -49,9 +57,30 @@ QUEENS = [
         'instagram': 'https://instagram.com',
         'twitter': 'https://twitter.com',
         'merchandise': 'https://etsy.com',
+'youtube_video_url': 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     },
 ]
+'''
+@login_required
+def check_upcoming_performances(request):
+    now = timezone.now()
+    in_24_hours = now + timedelta(hours=24, minutes=10)
 
+    upcoming_performances = Performance.objects.filter(
+        date__range=(now.date(), in_24_hours.date())
+    ).order_by('date', 'time')
+
+    notifications = []
+
+    for perf in upcoming_performances:
+        notifications.append({
+            'title': perf.title,
+            'venue': perf.venue,
+            'time': perf.time.strftime('%I:%M %p'),
+            'date': perf.date.strftime('%B %d, %Y')
+        })
+
+    return JsonResponse({'notifications': notifications})
 # Home page
 def home(request):
     """Home page view"""
@@ -79,73 +108,70 @@ def register(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Create user preferences
-            UserPreference.objects.create(user=user)
-            # Log the user in
             login(request, user)
-            messages.success(request, "Registration successful! Welcome to Drag Queens Atlanta!")
+            messages.success(request, "Registration successful! Welcome!")
             return redirect('home')
     else:
         form = CustomUserCreationForm()
-    
-    return render(request, 'registration/register.html', {'form': form})
 
+    return render(request, 'registration/register.html', {'form': form})
+@login_required
+def delete_performance(request, performance_id):
+    performance = get_object_or_404(Performance, id=performance_id)
+
+    # Correct permission check:
+    if performance.queen_id != request.user.profile.id:
+        messages.error(request, "You don't have permission to delete this performance.")
+        return redirect('performance_detail', performance_id=performance.id)
+
+    performance.delete()
+    messages.success(request, "Performance deleted successfully.")
+    return redirect('performances_list')
 # Queens views
 def queens_list(request):
-    """List all queens"""
-    # Get queens from database
-    db_queens = DragQueen.objects.all()
-    
-    # If database has queens, use those, otherwise use static data
-    if db_queens:
-        queens = db_queens
-    else:
-        queens = QUEENS
-        
-    return render(request, 'core/queens_list.html', {'queens': queens})
+    queens = DragQueen.objects.all()
+    return render(request, 'queens/queens_list.html', {'queens': queens})
+
 
 def queen_detail(request, queen_id):
     """Show details for a specific queen"""
-    # Try to get queen from database
-    try:
-        queen = DragQueen.objects.get(id=queen_id)
-        # Get upcoming performances for this queen
-        performances = Performance.objects.filter(
-            queen_id=queen.id,
-            date__gte=timezone.now().date()
-        ).order_by('date', 'time')
-        
-        # Get media for this queen
-        media = ProfileMedia.objects.filter(profile=queen)
-        
-        # Check if user is following this queen
-        is_following = False
-        if request.user.is_authenticated:
-            try:
-                is_following = request.user.preferences.favorite_queens.filter(id=queen_id).exists()
-            except UserPreference.DoesNotExist:
-                pass
-        
-        return render(request, 'core/queen_detail.html', {
-            'queen': queen,
-            'performances': performances,
-            'media': media,
-            'is_following': is_following
-        })
-    except DragQueen.DoesNotExist:
-        # Fall back to static data
-        queen = next((q for q in QUEENS if q['id'] == queen_id), None)
-        performances = Performance.objects.filter(drag_queen__id=queen_id)
-        
-        if not queen:
-            messages.error(request, "Queen not found!")
-            return redirect('queens_list')
-        
-        return render(request, 'core/queen_detail.html', {
-            'queen': queen,
-            'performances': performances,
-        })
+    queen = get_object_or_404(DragQueen, id=queen_id)
 
+    performances = Performance.objects.filter(
+        queen_id=queen.id,
+        date__gte=timezone.now().date()
+    ).order_by('date', 'time')
+
+    media = ProfileMedia.objects.filter(profile=queen)
+
+    # Check if user is following
+    is_following = False
+    if request.user.is_authenticated:
+        try:
+            is_following = request.user.preferences.favorite_queens.filter(id=queen_id).exists()
+        except UserPreference.DoesNotExist:
+            pass
+
+    return render(request, 'core/queen_detail.html', {
+        'queen': queen,
+        'performances': performances,
+        'media': media,
+        'is_following': is_following,
+    })
+
+@login_required
+def delete_review(request, review_id):
+    """Allow the drag queen to delete a review on their own performance"""
+    review = get_object_or_404(Review, id=review_id)
+    performance = review.performance
+
+    if hasattr(request.user, 'profile') and performance.queen_id == request.user.profile.id:
+        review.delete()
+        messages.success(request, "Review deleted successfully.")
+    else:
+        messages.error(request, "You are not authorized to delete this review.")
+
+    return redirect('performance_detail', performance_id=performance.id)
 # Performance views
 def performances_list(request):
     """List all performances with filtering options"""
@@ -255,7 +281,8 @@ def create_performance(request):
     else:
         form = PerformanceForm()
     
-    return render(request, 'performances/create_performance.html', {'form': form})
+    return render(request, 'performances/create_performance.html', {'form': form, 'queen': profile})
+
 
 @login_required
 def edit_performance(request, performance_id):
@@ -306,12 +333,12 @@ def performances_map(request):
 def submit_review(request, performance_id):
     """Submit a review for a performance"""
     performance = get_object_or_404(Performance, id=performance_id)
-    
+
     # Check if user has already reviewed this performance
     if Review.objects.filter(performance=performance, user=request.user).exists():
         messages.error(request, "You have already reviewed this performance!")
         return redirect('performance_detail', performance_id=performance_id)
-    
+
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
@@ -319,23 +346,23 @@ def submit_review(request, performance_id):
             review.user = request.user
             review.performance = performance
             review.save()
-            
+
             messages.success(request, "Thank you for your review!")
-            
-            # Notify the drag queen about the new review
-            if performance.drag_queen and performance.drag_queen.user:
+
+            # Notify the drag queen ONLY if the user has a profile
+            if hasattr(request.user, 'profile') and performance.queen_id == request.user.profile.id:
                 Notification.objects.create(
-                    user=performance.drag_queen.user,
+                    user=request.user,
                     notification_type='REVIEW',
                     title='New Review Received',
                     message=f'{request.user.username} left a {review.rating}-star review on your "{performance.title}" performance.',
                     related_performance=performance
                 )
-            
-            return redirect('performance_detail', performance_id=performance_id)
+
+            return redirect('performance_detail', performance_id=performance.id)
     else:
         form = ReviewForm()
-    
+
     return render(request, 'core/submit_review.html', {
         'form': form,
         'performance': performance,
@@ -366,25 +393,27 @@ def create_profile(request):
     
     return render(request, 'profiles/create_profile.html', {'form': form})
 
+
 @login_required
 def edit_profile(request):
     """Edit existing drag queen profile"""
     try:
         profile = DragQueen.objects.get(user=request.user)
     except DragQueen.DoesNotExist:
+        # Redirect to the profile creation page if the profile doesn't exist
         return redirect('create_profile')
-    
+
     if request.method == 'POST':
-        form = ProfileForm(request.POST, instance=profile)
+        # Include request.FILES to handle file uploads (like profile picture)
+        form = ProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
-            form.save()
+            form.save()  # Save the updated profile
             messages.success(request, "Profile updated successfully!")
             return redirect('profile_detail', pk=profile.id)
     else:
         form = ProfileForm(instance=profile)
-    
-    return render(request, 'profiles/edit_profile.html', {'form': form})
 
+    return render(request, 'profiles/edit_profile.html', {'form': form})
 def profile_detail(request, pk):
     """Public profile view"""
     profile = get_object_or_404(DragQueen, pk=pk)
@@ -523,14 +552,10 @@ def delete_media(request, media_id):
 def follow_queen(request, queen_id):
     """Follow a drag queen to receive notifications"""
     queen = get_object_or_404(DragQueen, id=queen_id)
-    
-    # Get or create user preferences
+
     preferences, created = UserPreference.objects.get_or_create(user=request.user)
-    
-    # Add queen to favorites
     preferences.favorite_queens.add(queen)
-    
-    # Create notification for the queen
+
     if queen.user:
         Notification.objects.create(
             user=queen.user,
@@ -538,8 +563,19 @@ def follow_queen(request, queen_id):
             title='New Follower',
             message=f'{request.user.username} is now following you!',
         )
-    
-    messages.success(request, f"You are now following {queen.name}! You'll receive notifications for their performances.")
+
+    # ✉️ Send a thank you email to the user!
+    if request.user.email:  # Just in case
+        send_mail(
+            subject=f"Thanks for following {queen.name}!",
+            message=f"Thank you for following {queen.name}! You'll now receive updates about their performances via email!",
+            from_email="noreply@dragqueensatl.com",  # change to your project email
+            recipient_list=[request.user.email],
+            fail_silently=True,  # won't crash the site if email settings are wrong
+        )
+
+    messages.success(request,
+                     f"You are now following {queen.name}! You'll receive notifications for their performances.")
     return redirect('queen_detail', queen_id=queen_id)
 
 @login_required
@@ -1648,18 +1684,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 
-def register(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)  # auto-login after registering
-            return redirect('create_profile')  # send them to create their profile
-    else:
-        form = UserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
-
-from .models import Review
 
 @login_required
 def my_reviews(request):

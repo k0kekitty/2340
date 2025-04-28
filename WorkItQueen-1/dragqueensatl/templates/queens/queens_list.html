@@ -12,7 +12,11 @@
     {% for queen in queens %}
         <div class="col-md-4 mb-4">
             <div class="card h-100">
-                <img src="{% static queen.image %}" class="card-img-top" alt="{{ queen.name }}">
+                {% if queen.profile_picture %}
+    <img src="{{ queen.profile_picture.url }}" class="card-img-top" alt="{{ queen.name }}">
+{% else %}
+    <img src="{% static queen.image %}" class="card-img-top" alt="{{ queen.name }}">
+{% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ queen.name }}</h5>
                     <p class="card-text">{{ queen.bio|truncatewords:30 }}</p>

@@ -43,7 +43,7 @@ class DragQueen(models.Model):
     merchandise = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True, null=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
-
+    youtube_video_url = models.URLField(blank=True, null=True)
     
     def __str__(self):
         return self.name

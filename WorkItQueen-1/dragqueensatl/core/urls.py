@@ -58,16 +58,16 @@ urlpatterns = [
     path('groups/<int:group_id>/photos/<int:photo_id>/delete/', views.delete_group_photo, name='delete_group_photo'),
     path('groups/<int:group_id>/events/<int:event_id>/photos/upload/', views.upload_event_photo, name='upload_event_photo'),
     path('groups/<int:group_id>/events/<int:event_id>/photos/<int:photo_id>/delete/', views.delete_event_photo, name='delete_event_photo'),
-    
+    path('api/check-performances/', views.check_upcoming_performances, name='check_upcoming_performances'),
     # Notifications
     path('notifications/', views.view_notifications, name='view_notifications'),
-
+    path('performances/<int:performance_id>/delete/', views.delete_performance, name='delete_performance'),
     path('register/', views.register, name='register'),
 
     path('my_reviews/', views.my_reviews, name='my_reviews'),
 
     path('profile/update_picture/', views.update_profile_picture, name='update_profile_picture'),
-
+    path('reviews/<int:review_id>/delete/', views.delete_review, name='delete_review'),
 
 
 ]

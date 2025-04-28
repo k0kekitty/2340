@@ -107,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/New_York'
 
 USE_I18N = True
 
@@ -163,6 +163,15 @@ LOGOUT_REDIRECT_URL = '/'
 # Default email settings for development
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@dragqueensatl.com'
-
+# Email configuration for Gmail
+'''
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'yourgmail@gmail.com'  # <-- your actual Gmail address
+EMAIL_HOST_PASSWORD = 'your_app_password'  # <-- your Gmail App Password (not your regular password)
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+'''
 # Add Google Maps API Key (replace with your actual key)
 GOOGLE_MAPS_API_KEY = ''
